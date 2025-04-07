@@ -6,30 +6,36 @@ def get_text(url):
     return response.text
 
 
-def count_word_frequencies(url, word):
+def count_word_frequencies(site_words, words_to_count):
+    site_words = [word.lower() for word in site_words]
+    count_words = {}
+    for word in site_words:
+        if word in words_to_count:
+            count_words[word] = count_words.get(word, 0) + 1
+
+    return count_words
+
+
+def word_frequencies(url):
     text = get_text(url)
     words = text.split()
-    count = 0
-    for w in words:
-        if w == word:
-            count += 1
-    return count
+    return words
 
 
 def main():
     words_file = "words.txt"
     url = "https://eng.mipt.ru/why-mipt/"
 
+    site_words = word_frequencies(url)
+
     words_to_count = []
     with open(words_file, 'r') as file:
-        for line in file:
-            word = line.strip()
-            if word:
-                words_to_count.append(word)
+        words_to_count = [line.strip().lower()
+                          for line in file if line.strip()]
 
-    frequencies = {}
-    for word in words_to_count:
-        frequencies[word] = count_word_frequencies(url, word)
+    words_to_count = set(words_to_count)
+
+    frequencies = count_word_frequencies(site_words, words_to_count)
 
     print(frequencies)
 
